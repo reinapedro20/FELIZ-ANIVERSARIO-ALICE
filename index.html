@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎂 Feliz Aniversário Alice 🎉</title>
+<style>
+body {
+  margin: 0;
+  background: linear-gradient(135deg, #ff7eb3, #ff758c);
+  font-family: Arial, sans-serif;
+  color: white;
+  overflow-x: hidden;
+}
+.confetti {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  background: red;
+  top: -10px;
+  animation: fall linear infinite;
+  z-index: 999;
+}
+@keyframes fall {
+  to { transform: translateY(110vh) rotate(360deg); }
+}
+.layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.card {
+  background: rgba(0,0,0,0.3);
+  padding: 25px;
+  border-radius: 20px;
+  max-width: 800px;
+  width: 90%;
+  text-align: center;
+  position: relative;
+  min-height: 150px; 
+}
+button {
+  margin: 12px;
+  padding: 12px 22px;
+  font-size: 16px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+}
+.sim { background: #fff; color: #ff5f9e; }
+.nao { 
+  background: #ff3b3b; 
+  color: white; 
+  position: relative;
+  display: inline-block;
+}
+.video-area {
+  margin: 20px auto;
+  width: 100%;
+  max-width: 900px;
+  border-radius: 15px;
+  overflow: hidden;
+  display: flex; /* agora o iframe do gato aparece sempre */
+  flex-direction: row;
+  gap: 10px;
+  justify-content: center;
+}
+.video-area iframe {
+  flex: 1;
+  min-width: 300px;
+  height: 400px;
+  border: none;
+  border-radius: 15px;
+}
+.video-area .mp4-container {
+  flex: 1;
+  min-width: 300px;
+  height: 400px;
+  border-radius: 15px;
+  overflow: hidden;
+  position: relative;
+  display: none; /* MP4s escondidos inicialmente */
+}
+.video-area video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 15px;
+  border: none;
+  display: none;
+}
+#surpresa {
+  display: none;
+  text-align: center;
+  width: 90%;
+  max-width: 900px;
+}
+/* MOBILE */
+@media (max-width: 900px) {
+  .card { width: 95%; padding: 20px; }
+  .video-area { flex-direction: column; }
+  .video-area iframe, .video-area .mp4-container { height: 250px; min-width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<div class="layout">
+  <div class="card" id="card">
+    <p id="pergunta">vai mandar foto da xereca raspadinha na cera? 😏</p>
+    <button class="sim" id="btnSim">SIM</button>
+    <button class="nao" id="btnNao">NÃO</button>
+  </div>
+
+  <div id="surpresa">
+    <h1 id="titulo">🎂 Feliz Aniversário Alice 🎉</h1>
+    <p id="mensagem">Olha os gatinhos cantando pra você! :3 </p>
+    <div class="video-area" id="videoArea">
+      <iframe id="gatoPlayer" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      <div class="mp4-container" id="mp4Container">
+        <video class="main" id="v1" playsinline preload="auto" muted src="https://files.catbox.moe/b551jw.mp4"></video>
+        <video class="main" id="v2" playsinline preload="auto" muted src="https://files.catbox.moe/xltbvx.mp4"></video>
+      </div>
+    </div>
+  </div>
+</div>
+
+<audio id="erro" src="https://www.myinstants.com/media/sounds/windows-error.mp3"></audio>
+
+<script>
+/* Confete */
+for (let i = 0; i < 120; i++) {
+  const c = document.createElement("div");
+  c.className = "confetti";
+  c.style.left = Math.random() * 100 + "vw";
+  c.style.background = `hsl(${Math.random()*360},100%,60%)`;
+  c.style.animationDuration = 2 + Math.random()*3 + "s";
+  c.style.opacity = Math.random();
+  document.body.appendChild(c);
+}
+
+/* Ativar som do gato no primeiro toque/clique */
+document.body.addEventListener("touchstart", ativarSom, { once: true });
+document.body.addEventListener("click", ativarSom, { once: true });
+function ativarSom() {
+  const srcComSom = "https://www.youtube.com/embed/k37QvhAyA2Y?autoplay=1&mute=0&loop=1&playlist=k37QvhAyA2Y&controls=0&modestbranding=1&showinfo=0&rel=0&iv_load_policy=3&disablekb=1&playsinline=1";
+  document.getElementById("gatoPlayer").src = srcComSom;
+}
+
+/* Botões */
+const btnNao = document.getElementById("btnNao");
+const btnSim = document.getElementById("btnSim");
+const erro = document.getElementById("erro");
+const surpresa = document.getElementById("surpresa");
+const mp4Container = document.getElementById("mp4Container");
+const videos = [document.getElementById("v1"), document.getElementById("v2")];
+let tentativas = 0;
+let jaClicou = false;
+
+// Botão NÃO - inicialmente parado ao lado do SIM
+btnNao.addEventListener("pointerdown", (e) => {
+  e.preventDefault();
+  tentativas++;
+  erro.currentTime = 0;
+  erro.play().catch(() => {});
+
+  // Transformar em SIM após 6 tentativas
+  if (tentativas >= 6) {
+    btnNao.innerText = "SIM";
+    btnNao.className = "sim";
+    btnNao.style.position = "relative";
+    btnNao.style.left = "";
+    btnNao.style.top = "";
+    btnNao.onclick = sim;
+    return;
+  }
+
+  // Primeira vez: transforma em absoluto, mas não se move ainda
+  if (!jaClicou) {
+    const rect = btnNao.getBoundingClientRect();
+    btnNao.style.position = "absolute";
+    btnNao.style.left = rect.left + "px";
+    btnNao.style.top = rect.top + "px";
+    jaClicou = true;
+    return;
+  }
+
+  // Movimentação curta (bem próxima do SIM)
+  const offset = 30; // distância pequena
+  let currentLeft = parseFloat(btnNao.style.left);
+  let currentTop = parseFloat(btnNao.style.top);
+
+  let newLeft = currentLeft + (Math.random() * (offset * 2) - offset);
+  let newTop = currentTop + (Math.random() * (offset * 2) - offset);
+
+  newLeft = Math.max(10, Math.min(newLeft, window.innerWidth - btnNao.offsetWidth - 10));
+  newTop = Math.max(10, Math.min(newTop, window.innerHeight - btnNao.offsetHeight - 10));
+
+  btnNao.style.left = newLeft + "px";
+  btnNao.style.top = newTop + "px";
+});
+
+// Botão SIM
+btnSim.onclick = sim;
+function sim() {
+  document.getElementById("card").style.display = "none";
+  surpresa.style.display = "block";
+  
+  // iframe do gato aparece instantaneamente
+  ativarSom(); 
+
+  // Delay apenas para MP4s
+  setTimeout(() => { 
+    mp4Container.style.display = "block";
+    tocar(0); 
+  }, 3000);
+}
+
+// Loop de vídeos MP4
+function tocar(i) {
+  videos.forEach(v => {
+    v.pause();
+    v.currentTime = 0;
+    v.style.display = "none";
+  });
+  const v = videos[i];
+  if(!v) return;
+  v.style.display = "block";
+  v.muted = false;
+  v.play().catch(e => console.log("Erro play:", e));
+  v.onended = () => {
+    const proximo = (i + 1) % videos.length;
+    tocar(proximo);
+  };
+}
+</script>
+</body>
+</html>
