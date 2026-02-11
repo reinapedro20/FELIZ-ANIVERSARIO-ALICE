@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎂 Feliz Aniversário Alice 🎉</title>
+<style>
+  body {
+    margin: 0;
+    background: linear-gradient(135deg, #ff7eb3, #ff758c);
+    font-family: Arial, sans-serif;
+    color: white;
+    overflow-x: hidden;
+    text-align: center;
+  }
+  .confetti {
+    position: fixed;
+    width: 8px; height: 8px;
+    top: -10px;
+    animation: fall linear infinite;
+    z-index: 999;
+  }
+  @keyframes fall { to { transform: translateY(110vh) rotate(360deg); } }
+
+  .layout {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .card {
+    background: rgba(0,0,0,0.3);
+    padding: 30px;
+    border-radius: 20px;
+    max-width: 500px;
+    width: 100%;
+    position: relative;
+  }
+
+  button {
+    margin: 10px;
+    padding: 15px 30px;
+    font-size: 18px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.2s;
+  }
+
+  .sim { background: #fff; color: #ff5f9e; }
+  .nao { background: #ff3b3b; color: white; position: relative; }
+
+  /* ÁREA DOS VÍDEOS */
+  #surpresa {
+    display: none;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  .video-container {
+    display: flex;
+    flex-direction: row; /* Lado a lado no PC */
+    gap: 15px;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .box {
+    flex: 1;
+    background: #000;
+    border-radius: 15px;
+    height: 450px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  iframe, video {
+    width: 100%;
+    height: 100%;
+    border: none;
+    object-fit: cover;
+  }
+
+  /* --- CORREÇÃO PARA CELULAR --- */
+  @media (max-width: 768px) {
+    .video-container {
+      flex-direction: column; /* Gatinhos em cima, MP4 em baixo */
+    }
+    .box {
+      height: 300px; /* Altura menor para caber na tela */
+      width: 100%;
+    }
+    h1 { font-size: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="layout" id="layoutInicial">
+  <div class="card" id="card">
+    <p id="pergunta" style="font-size: 1.2rem;">vai mandar foto da xereca raspadinha na cera? 😏</p>
+    <button class="sim" id="btnSim">SIM</button>
+    <button class="nao" id="btnNao">NÃO</button>
+  </div>
+</div>
+
+<div id="surpresa">
+  <h1>🎂 Feliz Aniversário Alice 🎉</h1>
+  <p>Gatinhos em cima, surpresa embaixo! 😻</p>
+  
+  <div class="video-container">
+    <div class="box">
+      <iframe id="gatoPlayer" src="" allow="autoplay"></iframe>
+    </div>
+    
+    <div class="box" id="boxMp4" style="display: none;">
+      <video id="v1" playsinline webkit-playsinline muted src="https://files.catbox.moe/b551jw.mp4"></video>
+      <video id="v2" playsinline webkit-playsinline muted src="https://files.catbox.moe/xltbvx.mp4" style="display:none;"></video>
+    </div>
+  </div>
+</div>
+
+<audio id="erro" src="https://www.myinstants.com/media/sounds/windows-error.mp3"></audio>
+
+<script>
+  // Confete
+  for (let i = 0; i < 80; i++) {
+    const c = document.createElement("div");
+    c.className = "confetti";
+    c.style.left = Math.random() * 100 + "vw";
+    c.style.background = `hsl(${Math.random()*360},100%,60%)`;
+    c.style.animationDuration = (2 + Math.random()*3) + "s";
+    document.body.appendChild(c);
+  }
+
+  const btnSim = document.getElementById('btnSim');
+  const btnNao = document.getElementById('btnNao');
+  const gato = document.getElementById('gatoPlayer');
+  const boxMp4 = document.getElementById('boxMp4');
+  const v1 = document.getElementById('v1');
+  const v2 = document.getElementById('v2');
+  let tentativas = 0;
+  let jaFugiu = false;
+
+  // Lógica do botão NÃO (Fuga curta e jogável)
+  btnNao.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    tentativas++;
+    document.getElementById('erro').play().catch(()=>{});
+
+    if (tentativas >= 6) {
+      btnNao.innerText = "SIM";
+      btnNao.className = "sim";
+      btnNao.style.position = "static";
+      btnNao.onclick = iniciar;
+      return;
+    }
+
+    if (!jaFugiu) {
+      btnNao.style.position = "fixed";
+      jaFugiu = true;
+    }
+
+    const dist = 100;
+    const x = Math.max(10, Math.min(window.innerWidth - 100, e.clientX + (Math.random()*dist*2 - dist)));
+    const y = Math.max(10, Math.min(window.innerHeight - 50, e.clientY + (Math.random()*dist*2 - dist)));
+    
+    btnNao.style.left = x + "px";
+    btnNao.style.top = y + "px";
+  });
+
+  btnSim.onclick = iniciar;
+
+  function iniciar() {
+    document.getElementById('layoutInicial').style.display = 'none';
+    document.getElementById('surpresa').style.display = 'block';
+
+    // 1. Liga o YouTube
+    gato.src = "https://www.youtube.com/embed/k37QvhAyA2Y?autoplay=1&mute=0&loop=1&playlist=k37QvhAyA2Y";
+
+    // 2. Espera 2 segundos e mostra o MP4
+    setTimeout(() => {
+      boxMp4.style.display = 'block';
+      tocarSequencia(v1, v2);
+    }, 2000);
+  }
+
+  function tocarSequencia(atual, proximo) {
+    atual.style.display = 'block';
+    atual.muted = false;
+    atual.play().catch(() => {
+        // Se o celular bloquear som, tenta tocar mudo
+        atual.muted = true;
+        atual.play();
+    });
+
+    atual.onended = () => {
+      atual.style.display = 'none';
+      if(proximo) tocarSequencia(proximo, atual); // Loop infinito entre os dois
+    };
+  }
+</script>
+</body>
+</html>
